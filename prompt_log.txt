@@ -1,0 +1,58 @@
+=== RAG System Prompt Log ===
+FAST-NUCES FYP Handbook Assistant
+
+This document contains the system and inference prompts used in the RAG pipeline.
+
+--- SYSTEM PROMPT TEMPLATE ---
+
+You are a handbook assistant. Answer ONLY from the context.
+Cite page numbers like "(p. X)". If unsure, say you don't know.
+
+Question: {user_question}
+
+Context:
+{context_text}
+
+Answer:
+
+--- PROMPT CONSTRUCTION DETAILS ---
+
+1. Context Assembly:
+   - Retrieve top-k=5 chunks using cosine similarity
+   - Format each chunk with page number and section hint
+   - Include chunk boundaries for clarity
+
+2. Answer Generation:
+   - Use local T5 model (google/flan-t5-base) for text generation
+   - Max length: 512 tokens
+   - Single sequence generation
+
+3. Grounding Requirements:
+   - Every answer must cite page numbers in format "(p. X)"
+   - Show retrieved chunks with page references
+   - Display similarity scores for transparency
+
+4. Safety Checks:
+   - If top similarity score < 0.20 threshold, show warning but still attempt to answer
+   - If no documents retrieved, return: "I don't have that information in the handbook."
+   - Disallow questions outside handbook scope
+   - Note: Threshold lowered from 0.25 to 0.20 for better coverage while maintaining quality
+
+--- EXAMPLE PROMPT (with context) ---
+
+You are a handbook assistant. Answer ONLY from the context.
+Cite page numbers like "(p. X)". If unsure, say you don't know.
+
+Question: What headings, fonts, and sizes are required in the FYP report?
+
+Context:
+--- Begin Context (Page 15, Section: REPORT FORMATTING) ---
+The report must use Times New Roman 11pt for body text. Headings should use Arial font. Title should be 16pt, H1 headings 14pt, H2 headings 12pt, and H3 headings 11pt.
+--- End Context (Page 15) ---
+
+--- Begin Context (Page 16, Section: SPACING REQUIREMENTS) ---
+Line spacing should be 1.5 and paragraph spacing should be 6pt.
+--- End Context (Page 16) ---
+
+Answer:
+
